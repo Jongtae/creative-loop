@@ -24,9 +24,9 @@ sanitized_original은 EXIF orientation을 적용하고 metadata를 제거한 ful
 
 `Provenance={origin:user_upload|licensed_source|ai_generated|derived|synthetic,source_config_id?,external_id?,parent_asset_ids:[],operation?,model?,model_revision?,prompt_version?,provider_call_id?,mask_hash?,transform_version?}`. 상용 원본·prompt 원문은 기본 export/audit에 제외한다.
 
-`RightsGrant={id,version,basis,allow_analysis,allow_generation,allow_model_input,allow_training,allow_original_storage,reviewed_at?,expires_at?,revoked_at?}`. 새 training/original 권한은 false 기본. 사용자 체크는 권한 주장 기록이지 법적 인증이 아니다. legacy 불명확 권한은 승격하지 않는다.
+`RightsGrant={id,version,basis,allow_analysis,allow_generation,allow_model_input,allow_export,allow_training,allow_original_storage,reviewed_at?,expires_at?,revoked_at?}`. 새 export/training/original 권한은 false 기본이다. `allow_export`는 해당 asset 또는 그 파생물을 전달·다운로드 가능한 결과물에 포함할 수 있는 권한이며, 분석·생성·모델입력 권한으로 대체하지 않는다. 사용자 체크는 권한 주장 기록이지 법적 인증이 아니다. legacy 불명확 권한은 승격하지 않는다.
 
-`check_rights(subject,purpose,at,expected_version)->PermissionDecision{allowed,reason_codes,grant_versions}`. purpose는 analysis/generation/model_input/training/original_storage 중 하나다. 외부 생성에는 generation과 model_input 모두 필요하다. 모델 학습은 추가 training 동의가 필요하다. 부모 provenance의 필요한 제한을 보존하고 순환/깊이 초과를 거부한다. enqueue와 실행 직전, 조회/검색/export/학습 시 재확인한다. grant version 변경은 승인·캐시 사용을 무효화한다. 권한 만료/철회는 현재 자료를 보유했다는 이유로 무시하지 않는다.
+`check_rights(subject,purpose,at,expected_version)->PermissionDecision{allowed,reason_codes,grant_versions}`. purpose는 analysis/generation/model_input/export/training/original_storage 중 하나다. 외부 생성에는 generation과 model_input 모두 필요하다. 전달 가능한 결과물에 asset 또는 파생물을 포함하는 export에는 export 권한이 필요하다. 모델 학습은 추가 training 동의가 필요하다. 부모 provenance의 필요한 제한을 보존하고 순환/깊이 초과를 거부한다. enqueue와 실행 직전, 조회/검색/export/학습 시 재확인한다. grant version 변경은 승인·캐시 사용을 무효화한다. 권한 만료/철회는 현재 자료를 보유했다는 이유로 무시하지 않는다.
 
 ## C03 — BrandKit·BriefSnapshot
 
@@ -113,7 +113,7 @@ text 속성은 text/font_family/font_size/font_weight/fill/align/line_height/max
 
 `ExportManifest={schema_version,id,created_at,mode,items:[{design_id,revision,scene_hash,brand_ref,asset_hashes,files:[{name,sha256,mime,width?,height?}],lint_version,fact_review_refs,evidence_snapshot_id?,model_refs:[],font_metadata:[],warnings:[]}],engine_version}`.
 
-파일명은 서버생성, 경로/ZIP traversal 금지. key·raw댓글·원문prompt·로컬절대경로·폰트binary를 기본 export에 포함하지 않는다. 누락폰트는 대체와 warning/확인; OS차이를 픽셀 동일 보장으로 표현하지 않는다. 전달 직전 권한재검사, 중간실패 temp정리. 이미 다운로드된 파일을 회수했다고 하지 않는다.
+파일명은 서버생성, 경로/ZIP traversal 금지. key·raw댓글·원문prompt·로컬절대경로·폰트binary를 기본 export에 포함하지 않는다. 누락폰트는 대체와 warning/확인; OS차이를 픽셀 동일 보장으로 표현하지 않는다. 전달 직전에는 각 포함 asset과 필요한 부모 provenance에 `purpose=export`로 권한을 재검사하고, 분석 전용 asset은 결과물에 포함하지 않는다. 중간실패 temp를 정리하며 이미 다운로드된 파일을 회수했다고 하지 않는다.
 
 ## C09 — SourceConfig·ObservationV2·수집
 

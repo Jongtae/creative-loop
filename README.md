@@ -129,13 +129,16 @@ python -m playwright install chromium
 python scripts/browser_smoke.py --transport network --artifacts artifacts
 ```
 
-이번 검증 결과: **자동 테스트 69개 통과**, **Chromium 기반 작업 흐름 10개 통과**. 브라우저 검증은 환경 정책상 localhost 직접 탐색이 차단되어, 네트워크 접근 없이 실제 FastAPI TestClient에 연결하는 `--transport inprocess`로 수행했습니다. 실제 HTTP 전송 기반 브라우저 E2E, 유료 AI, SNS API, Docker, GitHub CI는 미검증입니다. 상세 조건은 `docs/VALIDATION.md`에 기록했습니다.
+이번 로컬 검증 결과: **자동 테스트 110개 통과**, **네트워크 전송 Chromium 작업 흐름 10개 통과**. 테스트는 임시 DB를 사용했고 외부 AI 호출은 0회였습니다. 유료 AI, SNS API, Docker, GitHub CI는 미검증입니다. 상세 조건은 `docs/VALIDATION.md`에 기록했습니다.
 
-## 프로젝트 문서
+## 구현 계획과 프로젝트 문서
+
+현재 기능 확장은 [구현 계획 인덱스](docs/implementation/INDEX.md)의 `plan-v2-parallel`을 기준으로 합니다. 시작·병합·실제 외부 실행의 선행 조건은 [실행 계약](docs/implementation/EXECUTION.md)과 [작업 DAG](docs/implementation/plan.json)를 따릅니다. 이 문서의 현재 MVP 설명과 [개발 백로그](docs/BACKLOG.md)의 기존 단계는 제품 범위와 배경을 위한 보존 기록이며, 새 작업의 순서를 정하지 않습니다. 계획 문서는 지속 실행기나 자동병합이 이미 활성화됐다는 뜻이 아닙니다.
 
 - [요구사항과 MVP 기준](docs/PRD.md) · [구조와 알고리즘](docs/ARCHITECTURE.md)
 - [데이터 계약](docs/DATA_CONTRACT.md) · [연구 원문 채택·보류 기록](docs/RESEARCH_ADOPTION.md)
 - [테스트 결과와 남은 검증](docs/VALIDATION.md) · [개발 백로그](docs/BACKLOG.md)
+- [병렬 구현 실행 계약](docs/implementation/EXECUTION.md) · [병렬 설계](docs/implementation/PARALLEL_EXECUTION.md) · [제품 계약](docs/implementation/CONTRACTS.md)
 - [공식 기술 문서](docs/SOURCES.md) · [개발 에이전트 지침](AGENTS.md) · [보안 경계](SECURITY.md)
 
 **완료된 첫 단계:** 로컬에서 디자인을 생성·수정·비교·선택·내보내는 제작 흐름. **다음 핵심 단계:** 실제 AI 호출 파일럿, 사용권을 확보한 소셜 데이터 한 개 연결, 인간 선택·실제 반응으로 평가 모델의 유효성 검증.
