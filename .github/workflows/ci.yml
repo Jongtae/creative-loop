@@ -1,16 +1,30 @@
 name: MVP checks
 on:
   push:
+    branches: [main]
   pull_request:
 permissions:
   contents: read
+concurrency:
+  group: mvp-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+env:
+  ALLOW_EXTERNAL_AI: "0"
+  OPENAI_API_KEY: ""
 jobs:
-  verify:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python scripts/parallel_plan.py
+      - run: python -c "import pathlib,tomllib; [tomllib.loads(p.read_text()) for p in pathlib.Path('.codex').rglob('*.toml')]"
+  unit:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      ALLOW_EXTERNAL_AI: "0"
-      OPENAI_API_KEY: ""
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,10 +33,36 @@ jobs:
           cache: pip
       - run: pip install -r requirements-dev.txt
       - run: python -m pytest -q
+      - run: node --check creative_loop/static/app.js
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+      - run: pip install -r requirements-dev.txt
       - run: python -m playwright install --with-deps chromium
       - run: python scripts/browser_smoke.py --transport network --artifacts artifacts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: browser-smoke
+          name: browser-smoke-${{ github.run_id }}-${{ github.run_attempt }}
           path: artifacts/
+  verify:
+    if: always()
+    needs: [plan, unit, browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require every check to pass
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          UNIT_RESULT: ${{ needs.unit.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: |
+          test "$PLAN_RESULT" = success
+          test "$UNIT_RESULT" = success
+          test "$BROWSER_RESULT" = success

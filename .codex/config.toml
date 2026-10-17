@@ -1,0 +1,23 @@
+# Coding model, not the product image model. Verify effective client configuration.
+model = "gpt-5.6-terra"
+model_reasoning_effort = "medium"
+plan_mode_reasoning_effort = "medium"
+review_model = "gpt-5.6-terra"
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[agents]
+default_subagent_model = "gpt-5.6-terra"
+default_subagent_reasoning_effort = "medium"
+max_concurrent_threads_per_session = 6
+
+[agents.builder]
+description = "One assigned issue in one reserved worktree; no nested agents, GitHub writes or policy edits."
+config_file = "agents/builder.toml"
+
+[agents.reviewer]
+description = "Read-only separate-context review of an immutable issue diff and actual test evidence."
+config_file = "agents/reviewer.toml"
+
+# 4 builders + 2 reviewers is a scheduler policy, not enforced by this setting alone.
+# Separate CLI root sessions require a global pool cap. No automatic startup here.

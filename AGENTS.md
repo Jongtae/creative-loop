@@ -35,3 +35,14 @@ python scripts/browser_smoke.py --transport network --artifacts artifacts
 ```
 
 Offline UI transport is available as `--transport inprocess`; report its network-testing limitation. No test should make a live paid request. Add MockTransport tests for all new provider contracts and failure paths. Update `docs/VALIDATION.md` only with actual results, not intended results. Update README/backlog whenever scope or verification status changes.
+
+## Parallel implementation / plan-v2
+
+Read docs/implementation/EXECUTION.md and PARALLEL_EXECUTION.md before coding.
+Their start/merge/live dependency policy replaces the v1 single-implementation-PR rule.
+The product's one-worker limit above is NOT a limit on isolated coding workers.
+Default development pool: four builders, two read-only reviewers, one trusted merger.
+Use independent worktrees/DBs/ports and reserve exact write paths; do not edit another worker's branch.
+Routine PRs may merge without individual owner clicks only after a scoped local run policy is activated and required checks/reviews pass. Never bypass branch protections or change your own policy.
+The repository currently includes a dry-run planning aid, not a running autonomous daemon. AUTO-001~005 require implementation and runtime verification; never report them complete from plan tests.
+Retain all MVP acceptance criteria and actual external/human gates. One blocked task must not stop unrelated ready work.
