@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "transport": "inprocess",
+  "checks": [
+    "Generate 12 variants in browser",
+    "Edit headline and persist revision",
+    "Pairwise preference persisted",
+    "Browser PNG export at 1080 x 1080",
+    "Selected SVG + JSON ZIP export",
+    "Image upload + automatic pixel features",
+    "JSON reaction import with explicit DEMO labels",
+    "History reopens persisted batch",
+    "390px mobile layout without horizontal overflow",
+    "No browser JavaScript exceptions"
+  ],
+  "count": 10,
+  "provider_live_calls": 0,
+  "database": "temporary; discarded after test"
+}

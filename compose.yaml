@@ -1,0 +1,23 @@
+services:
+  creative-loop:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DATA_DIR: /app/data
+      APP_TOKEN: ${APP_TOKEN:-}
+      ALLOWED_HOSTS: "127.0.0.1,localhost,::1"
+      ALLOW_EXTERNAL_AI: ${ALLOW_EXTERNAL_AI:-0}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
+      OPENAI_IMAGE_MODEL: ${OPENAI_IMAGE_MODEL:-}
+      MAX_PROVIDER_CALLS_PER_DAY: ${MAX_PROVIDER_CALLS_PER_DAY:-20}
+    volumes:
+      - creative-loop-data:/app/data
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+volumes:
+  creative-loop-data:
