@@ -19,3 +19,7 @@ htmlcov/
 .DS_Store
 .idea/
 .vscode/
+
+# Private coordinator state and isolated coding worktrees
+.automation/
+.worktrees/
